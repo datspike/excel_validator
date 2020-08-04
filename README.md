@@ -7,7 +7,7 @@ It was created in my *free* time to improve process of parsing excel files in my
  
 ## Requirements
 
-Python 2.7
+Python 3 (version ?) - tested on 3.8
  
 All necessary python libraries are listed in [requirements.txt](../master/requirements.txt)
  
