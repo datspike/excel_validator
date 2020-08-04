@@ -1,4 +1,4 @@
-import BaseValidator
+import validator.BaseValidator as BaseValidator
 import re
 
 class NotBlankValidator(BaseValidator.BaseValidator):

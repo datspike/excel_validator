@@ -1,10 +1,11 @@
-import BaseValidator
+import validator.BaseValidator as BaseValidator
 from datetime import datetime
+from builtins import str
 
 class DateTimeValidator(BaseValidator.BaseValidator):
 
     message = "This value is not valid datetime"
-    format = "%Y-%m-%d"
+    format = None  # should be an strptime date format "%Y-%m-%d"
 
     def validate(self, value):
 
@@ -22,7 +23,7 @@ class DateTimeValidator(BaseValidator.BaseValidator):
                 
                 return False
         try:
-            if type(value) is unicode or type(value) is str:
+            if type(value) is str:
                 datetime.strptime(value, self.format)
 
                 return True
@@ -35,3 +36,7 @@ class DateTimeValidator(BaseValidator.BaseValidator):
 
     def __init__(self, params):
         super(DateTimeValidator, self).__init__(params)
+        if 'format' in params:
+            self.format = params.get('format')
+        else:
+            self.format = "%Y-%m-%d"

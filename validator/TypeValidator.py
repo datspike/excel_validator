@@ -1,4 +1,4 @@
-import BaseValidator
+import validator.BaseValidator as BaseValidator
 
 class TypeValidator(BaseValidator.BaseValidator):
 
@@ -22,7 +22,6 @@ class TypeValidator(BaseValidator.BaseValidator):
         return getattr(self, self.types[self.type])(value)
 
     def isInteger(self, value):
-
         try:
             int(value)
 

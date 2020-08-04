@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from builtins import str
 
-class BaseValidator:
+class BaseValidator(object):
     __metaclass__ = ABCMeta
 
     trim = False
@@ -11,7 +12,7 @@ class BaseValidator:
 
     @abstractmethod
     def validate(self, value):
-        if self.trim is True and (type(value) is unicode or type(value) is str):
+        if self.trim is True and type(value) is str:
             return value.strip()
 
         return value

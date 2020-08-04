@@ -1,5 +1,7 @@
-import BaseValidator
+import validator.BaseValidator as BaseValidator
 import re
+from builtins import str
+
 class RegexValidator(BaseValidator.BaseValidator):
 
     pattern = None
@@ -12,8 +14,8 @@ class RegexValidator(BaseValidator.BaseValidator):
             return True
 
         value = super(RegexValidator, self).validate(value)
-        if type(value) is not unicode:
-            value = (str)(value)
+        if type(value) is not str:
+            value = str(value)
 
         if re.match(self.pattern, value):
             return True

@@ -1,4 +1,5 @@
-import BaseValidator
+# coding=utf-8
+import validator.BaseValidator as BaseValidator
 class ConditionalValidator(BaseValidator.BaseValidator):
 
     operator = None #should be a lambda expression which return boolean variable
@@ -9,6 +10,8 @@ class ConditionalValidator(BaseValidator.BaseValidator):
         fieldA = super(ConditionalValidator, self).validate(fieldA)
         fieldB = super(ConditionalValidator, self).validate(fieldB)
 
+        if (fieldA is None) or (fieldB is None):
+            return False
         return self.operator(fieldA, fieldB)
 
     def __init__(self, params):

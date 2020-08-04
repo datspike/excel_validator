@@ -1,59 +1,101 @@
-header: "ID" #if set script will find this "header row" and will start parsing from next line
-excludes: ["L"] #these columns will be not validated
+data_from_row: "3" # с какой строки перестать проверять валидатором заголовков и начать проверять таблицу валидаторами данных
+excludes: ["L"] # данные колонки не будут обработаны
 
 #range: ["A","D"]
-#this option set range of columns which should be process for validation.
-#In this case form A (included) to D (included)
-#range and excludes options can be used together
+# указать диапазон проверки, можно использовать вместе с excludes
 
 validators:
 
     default:
         - NotBlank:
-            message: Value can not be blank
+            message: Значение не может быть пустым
 
-    #default validator is used for not excluded columns for which no other validation rule is set
+    # стандартный валидатор, используется для колонок, для которых валидатор не указан
 
     columns:
         A:
-          - NotBlank:
-              message: Value can not be blank
+            - Header:
+                header: "ID"
+                message: Неверный заголовок
+                trim: true
+            
+            - NotBlank:
+                message: Значение не может быть пустым
 
-          - Regex:
-              pattern: "\\d{3}\\-\\d{3}\\-\\d{3}"
-              message: Value do not match pattern
+            - Regex:
+                pattern: "\\d{3}\\-\\d{3}\\-\\d{3}"
+                message: Значение не совпадает с регулярным выражением
 
         B:
-           - Length:
-              max: 3
-              maxMessage: Value is too long
+            - Header:
+                header: "Title111"
+                message: Неверный заголовок
+                trim: true
+                
+            
+            - Length:
+                max: 3
+                maxMessage: Слишком длинное значение
 
         C:
+            - Header:
+                row: 1
+                header: "Name"
+                message: Неверный заголовок
+                trim: true
+               
+            - Header:
+                row: 2
+                header: "First"
+                message: Неверный заголовок
+                trim: true
+        
             - Length:
                 min: 3
-                minMessage: Value is too short
+                minMessage: Слишком короткое значение
 
         D:
+            - Header:
+                row: 2
+                header: "Last"
+                message: Неверный заголовок
+                trim: true
+        
             - Length:
                 min: 3
-                minMessage: Value is too short
+                minMessage: Слишком короткое значение
 
         E:
+            - Header:
+                header: "Gender"
+                message: Неверный заголовок
+                trim: true
+        
             - Choice:
                 choices: ["male", "female"]
-                message: Gender should be male, female
+                message: Пол должен быть одним из ["male", "female"]
                 caseSensitive: False #set choice validator as case insensitive (by default is case sensitive)
 
         F:
+            - Header:
+                header: "Country"
+                message: Неверный заголовок
+                trim: true
+        
             - Country:
-                message: "Value is not correct country"
+                message: Значение не является названием настоящей страны
                 trim: true
 
                 #check if value is valid country
                 #@see https://pypi.python.org/pypi/pycountry/
         G:
+            - Header:
+                header: "Email"
+                message: Неверный заголовок
+                trim: true
+        
             - Email:
-                message: "Field should be correct email address"
+                message: Значение не является корректным адресом эл. почты
                 trim: true
 
                  #trim option (true/false) is valid for all validators
@@ -61,13 +103,18 @@ validators:
                  #default: False
 
         H:
+            - Header:
+                header: "Quantity"
+                message: Неверный заголовок
+                trim: true
+                
             - Type:
                 type: integer
-                message: "Value should be integer"
+                message: Значение должно быть целочисленным
                 trim: true
 
             - Conditional:
-                message: "Quantity can not be higher than in stock"
+                message: Значение должно быть больше чем в ячейке J
                 fieldB: "J"
                 operator: "lambda h, j: (False if (h > j) else True)"
                 trim: true
@@ -75,18 +122,34 @@ validators:
                 #contiditional validator check lambda expression (operator) fo selected column and fieldB column
                 #expression has to return boolean value
         I:
+            - Header:
+                header: "Price"
+                message: Неверный заголовок
+                trim: true
+            
             - Type:
                 type: integer
-                message: "Value should be integer"
+                message: Значение должно быть целочисленным
                 trim: true
 
         J:
+            - Header:
+                header: "In Stock"
+                message: Неверный заголовок
+                trim: true
+        
             - Type:
                 type: integer
-                message: "Value should be integer"
+                message: Значение должно быть целочисленным
                 trim: true
 
         K:
+            - Header:
+                header: "Order Date"
+                message: Неверный заголовок
+                trim: true
+                
             - ExcelDate:
-                message: "Value should be a date value"
+                message: Значение должно быть датой формата "%Y-%m-%d"
+                format: "%Y-%m-%d"
                 trim: true

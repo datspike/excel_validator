@@ -1,4 +1,5 @@
-import BaseValidator
+# coding=utf-8
+import validator.BaseValidator as BaseValidator
 import pycountry
 
 class CountryValidator(BaseValidator.BaseValidator):
@@ -16,7 +17,7 @@ class CountryValidator(BaseValidator.BaseValidator):
         try:
             CountryValidator.countries.get(name = value)
             return True
-        except(KeyError):
+        except(KeyError, LookupError):
             return False
 
     def __init__(self, params):

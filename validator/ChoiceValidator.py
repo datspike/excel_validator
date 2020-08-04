@@ -1,4 +1,4 @@
-import BaseValidator
+import validator.BaseValidator as BaseValidator
 
 class ChoiceValidator(BaseValidator.BaseValidator):
 
