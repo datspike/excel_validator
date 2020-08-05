@@ -195,11 +195,7 @@ def validate(settings, excelFile, sheetName, tmpDir, printErrors=False):
         if isEmpty(row):
             continue
         for cell_column, cell in enumerate(row, 1):
-            try:
-                coordinates = get_column_letter(cell_column) + str(rom_counter)
-            except AttributeError:
-                print('attribute error')
-                continue
+            coordinates = get_column_letter(cell_column) + str(rom_counter)
             try:
                 value = cell.value
             except ValueError:
