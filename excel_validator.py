@@ -93,10 +93,16 @@ def setSettings(config):
     else:
         settings['excludes'] = []
 
-    if 'range' in config:
-        settings['range'] = config.get('range')[0] + "1:" + config.get('range')[1]
-    else:
-        settings['range'] = None
+    settings['range'] = dict(min_row=None, max_row=None,
+                             min_col=None, max_col=None)
+
+    if 'range_col' in config:
+        settings['range']['min_col'] = column_index_from_string(config.get('range_col')[0])
+        settings['range']['max_col'] = column_index_from_string(config.get('range_col')[1])
+
+    if 'range_row' in config:
+        settings['range']['min_row'] = int(config.get('range_row')[0])
+        settings['range']['max_row'] = int(config.get('range_row')[1])
 
     if 'data_from_row' in config:
         settings['data_from_row'] = int(config.get('data_from_row'))
@@ -172,58 +178,58 @@ def validate(settings, excelFile, sheetName, tmpDir, printErrors=False):
     wb = load_workbook(excelFile, keep_vba=True, data_only=True, read_only=True)
     ws = wb.get_sheet_by_name(sheetName)
 
-    progressBar = Bar('Processing', max=ws.max_row)
+    if 'range' in settings and settings['range']['max_row'] is None:
+        settings['range']['max_row'] = ws.max_row
+        settings['range']['min_row'] = ws.min_row
+    if 'range' in settings and settings['range']['max_col'] is None:
+        settings['range']['max_col'] = ws.max_column
+        settings['range']['min_col'] = ws.min_column
+    print(settings['range'])
 
-    if 'range' in settings and settings['range'] != None:
-        settings['range'] = settings['range'] + (str)(ws.max_row)
+    progressBar = Bar('Processing', max=settings['range']['max_row'])
 
     # iterate excel sheet
-    rowCounter = 0
-    for row in ws.iter_rows(settings['range']):
+    for rom_counter, row in enumerate(ws.iter_rows(**settings['range']), 1):
         progressBar.next()
-        columnCounter = 0
-        rowCounter = rowCounter + 1
         # do not parse empty rows
         if isEmpty(row):
             continue
-        for cell in row:
-            columnCounter = columnCounter + 1
+        for cell_column, cell in enumerate(row, 1):
+            try:
+                coordinates = get_column_letter(cell_column) + str(rom_counter)
+            except AttributeError:
+                print('attribute error')
+                continue
             try:
                 value = cell.value
             except ValueError:
-                # case when it is not possible to read value at all from any reason
-                column = get_column_letter(columnCounter)
-                coordinates = "%s%d" % (column, rowCounter)
                 errors.append((coordinates, ValueError))
 
             # skip excludes column
-            if hasattr(cell, 'column') and cell.column in settings['excludes']:
+            if hasattr(cell, 'column') and cell_column in settings['excludes']:
                 continue
 
-            column = get_column_letter(columnCounter)
-            coordinates = "%s%d" % (column, rowCounter)
-
-            if column in settings['validators']:
-                for type in settings['validators'][column]:
+            if get_column_letter(cell_column) in settings['validators']:
+                for type in settings['validators'][get_column_letter(cell_column)]:
                     name = list(type.keys())[0]
                     if name == 'Header':
                         try:
                             row_to_check = int(list(type.values())[0]['row'])
                         except KeyError:
                             row_to_check = 1
-                        if rowCounter == row_to_check:
+                        if rom_counter == row_to_check:
                             isValid(type, value, coordinates, errors)
                         continue
-                    elif rowCounter >= settings['data_from_row']:
+                    elif rom_counter >= settings['data_from_row']:
                         if name == 'Conditional':
                             fieldB = list(type.values())[0]['fieldB']
-                            value2 = ws[fieldB + str(rowCounter)].value
+                            value2 = ws[fieldB + str(rom_counter)].value
                             isValid(type, value, coordinates, errors, value2)
                             continue
                         else:
                             isValid(type, value, coordinates, errors)
 
-            elif settings['defaultValidator'] != None and rowCounter >= settings['data_from_row']:
+            elif settings['defaultValidator'] != None and rom_counter >= settings['data_from_row']:
                 isValid(settings['defaultValidator'], value, coordinates, errors)
 
     progressBar.finish()
